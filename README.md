@@ -10,10 +10,7 @@ npm run dev
 yarn dev
 ```
 
-
-
-https://user-images.githubusercontent.com/23313787/153844706-6130afbf-f9aa-46d0-a248-5e30b22ba7b0.mp4
-
+[![Watch the video](https://user-images.githubusercontent.com/23313787/153848127-fd53a68e-3a91-4fed-9ff1-6b2cd9cda05f.jpg)](https://youtu.be/lXQkeYcaBCU)
 
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
