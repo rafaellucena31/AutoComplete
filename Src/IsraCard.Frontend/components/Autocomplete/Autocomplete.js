@@ -1,17 +1,33 @@
 import { useState, useRef, useEffect } from "react";
 
-const Autocomplete = ({ suggestions, handleInputSelected, handleInputChanged }) => {
+const Autocomplete = ({ suggestions, handleInputSelected, handleInputChanged, handleInputClear }) => {
 
-    const debugControl = {'isOn': true, 'logKeyboard': true, 'logEffects': false};
+    const debugControl = {'isOn': false, 'logKeyboard': false, 'logEffects': false};
 
     const [filteredSuggestions, setFilteredSuggestions] = useState([]);
+    
     const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(0);
+    const [onBlurFired, setOnBlurFired] = useState(false);
     const [showSuggestions, setShowSuggestions] = useState(false);
-    const [input, setInput] = useState("");
+    const [input, setInput] = useState({"name": ""});
     const [inputSelected, setInputSelected] = useState("");
     const currentElementSelectedRef = useRef(null);
     const currentSuggestionsRef = useRef(null);
     
+    useEffect(() => {
+      setFilteredSuggestions([]);
+        setShowSuggestions(false);
+      if (suggestions && suggestions.length > 0) {
+        const unLinked = suggestions.filter(
+          (suggestion) =>
+            suggestion.name.toLowerCase().startsWith(input?.name?.toLowerCase() ?? "") !== false
+        );
+        
+        setFilteredSuggestions(unLinked);
+        setShowSuggestions(true);
+      }
+    }, [suggestions])
+
     useEffect(() => {
         if (handleInputSelected !== undefined) {
             handleInputSelected(inputSelected)
@@ -19,11 +35,10 @@ const Autocomplete = ({ suggestions, handleInputSelected, handleInputChanged }) 
     }, [handleInputSelected, inputSelected])
 
     useEffect(() => {
-        debugger
-        if (handleInputChanged !== undefined) {
+        if (handleInputChanged !== undefined && input && input.length > 0) {
             handleInputChanged(input)
         }
-    }, [input, handleInputChanged])
+    }, [input])
 
     useEffect(() => {
         if (currentElementSelectedRef.current !== null && currentSuggestionsRef.current !== null) {
@@ -61,35 +76,47 @@ const Autocomplete = ({ suggestions, handleInputSelected, handleInputChanged }) 
         }
     }, [activeSuggestionIndex, currentElementSelectedRef.current, currentSuggestionsRef.current ])
 
-    const onBlur = () => {
-        setInput(inputSelected);
+    useEffect(() => {
+      if (onBlurFired) {
+        console.log(inputSelected);
+        setInput({"name": inputSelected?.name ?? ""});
         setShowSuggestions(false);
+        if (handleInputClear) handleInputClear();
+      }
+      
+    }, [inputSelected, onBlurFired])
+
+    const onBlur = () => {
+        setTimeout(() => {
+          if (debugControl.isOn) console.log('onBlur');
+          setOnBlurFired(true);
+        }, 100);
+        
     }
 
     const handleClearSelection = () => {
       setInputSelected("");
-      setInput("");
+      setInput({"name": ""});
+      if (handleInputClear) handleInputClear();
     }
 
     const onChange = (e) => {
-        const userInput = e.target.value;
-        
-        // Filter our suggestions that don't contain the user's input
-        const unLinked = suggestions.filter(
-          (suggestion) =>
-            suggestion.toLowerCase().startsWith(userInput.toLowerCase()) !== false
-        );
-        
-        setInput(e.target.value);
-        setFilteredSuggestions(unLinked);
+      setOnBlurFired(false);
+        if (debugControl.isOn) console.log('onChange');
+        setInput({"name": e.target.value});
         setActiveSuggestionIndex(0);
         setShowSuggestions(true);
+        handleInputChanged({"name": e.target.value});
+        setFilteredSuggestions([]);
       };
     
-      const onClick = (e) => {
+      const onClick = (_, key) => {
+        if (debugControl.isOn) console.log('onClick');
+        let clicked = filteredSuggestions[key];
+        if (debugControl.isOn) console.log(clicked);
+        setInput({"name": clicked.name});
+        setInputSelected(clicked);
         setFilteredSuggestions([]);
-        setInput(e.target.innerText);
-        setInputSelected(e.target.innerText);
         setActiveSuggestionIndex(0);
         setShowSuggestions(false);
       };
@@ -97,8 +124,9 @@ const Autocomplete = ({ suggestions, handleInputSelected, handleInputChanged }) 
       const onKeyDown = (e) => {
         // User pressed the enter key
         if (e.keyCode === 13) {
-          setInput(filteredSuggestions[activeSuggestionIndex]);
+          setInput({"name": filteredSuggestions[activeSuggestionIndex].name});
           setInputSelected(filteredSuggestions[activeSuggestionIndex]);
+          setFilteredSuggestions([]);
           setActiveSuggestionIndex(0);
           setShowSuggestions(false);
         }
@@ -123,19 +151,27 @@ const Autocomplete = ({ suggestions, handleInputSelected, handleInputChanged }) 
       };
 
       const highlightText = (suggestion, userInput) => {    
-          let indexElement = suggestion.toLowerCase().indexOf(userInput.toLowerCase()) + userInput.length;
-          let prefix = suggestion.substring(0, indexElement);
-          let suffix = suggestion.substring(indexElement);
-          debugger
+          let indexElement = suggestion.name.toLowerCase().indexOf(userInput.name.toLowerCase()) + userInput.name.length;
+          let prefix = suggestion.name.substring(0, indexElement);
+          let suffix = suggestion.name.substring(indexElement);
+          
           return (
-              <>
-                <span className="bg-yellow-400">{prefix}</span>{suffix}
-              </>
+              <div>
+                <div>
+                  <span className="bg-yellow-400">{prefix}</span>{suffix}
+                </div>
+                <div>
+                  <span className="">Country: {suggestion.country}</span>
+                </div>
+                <div>
+                  <span className="">SubCountry: {suggestion.subcountry}</span>
+                </div>
+              </div>
           )
       }
 
       const SuggestionsListComponent = () => {
-        return filteredSuggestions.length ? (
+        return filteredSuggestions && filteredSuggestions.length ? (
           <div ref={currentSuggestionsRef} className="flex flex-col absolute w-full z-50 bg-white border border-gray-300 mt-1 max-h-64 overflow-hidden overflow-y-scroll rounded shadow">
             {filteredSuggestions.map((suggestion, index) => {
               let className = "px-3 py-2 cursor-pointer text-left";
@@ -150,11 +186,11 @@ const Autocomplete = ({ suggestions, handleInputSelected, handleInputChanged }) 
     
               return (
                 flagActiveSuggestion ?
-                <div className={className} key={index} onClick={onClick} ref={currentElementSelectedRef}>
+                <div className={className} key={index} onClick={(e) => onClick(e, index)} ref={currentElementSelectedRef}>
                     {highlightText(suggestion, input)}
                 </div>
                 :
-                <div className={className} key={index} onClick={onClick}>
+                <div className={className} key={index} onClick={(e) => onClick(e, index)}>
                     {highlightText(suggestion, input)}
                 </div>
               );
@@ -185,10 +221,10 @@ const Autocomplete = ({ suggestions, handleInputSelected, handleInputChanged }) 
                             onChange={onChange}
                             onKeyDown={onKeyDown}
                             onBlur={onBlur}
-                            value={input}
+                            value={input.name || ""}
                     />
                 </div>
-                {(inputSelected && inputSelected.length > 0) && 
+                {inputSelected && 
                     <div className={"w-1/12"}>
                         <p 
                         className="

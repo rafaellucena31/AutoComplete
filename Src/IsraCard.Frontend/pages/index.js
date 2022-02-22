@@ -1,15 +1,42 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from 'next/link'
-
 import Autocomplete from '../components/Autocomplete/Autocomplete'
-
+import useDebounce from '../hooks/useDebounce'
 
 export default function Home() {
   const [inputSelected, setInputSelected] = useState("");
-  const [suggestions, setSuggestions] = useState(['Rafael11', 'Maria', 'Marieta', 'Rafael4', 'Rafael5', 'Rafael6', 'Rafael7', 'Rafael8', 'Rafael9', 'Rafael10']);
+  const [urlAutoComplete, setUrlAutoComplete] = useState("");
+  const [suggestions, setSuggestions] = useState([]);
+  
+  const debouncedSearchTerm = useDebounce(urlAutoComplete, 300);
+
   const handleInputSelected = (selectedValue) => {
     setInputSelected(selectedValue);
   }
+  
+  const handleInputChanged = (changedValue) => {
+    if (changedValue.name) {
+      let urlAutoComplete = `${"https://localhost:7163/api/v1/"}cities/autocomplete/${changedValue.name}`;
+      setUrlAutoComplete(urlAutoComplete);
+      //let response = await fetch(urlAutoComplete);
+      //let data = await response.json()
+      //setSuggestions(data);
+    } 
+  }
+
+  const handleInputClear = () => {
+    setUrlAutoComplete("");
+  }
+
+  useEffect(async () => {
+    if (debouncedSearchTerm) {
+      setSuggestions([]);
+      let response = await fetch(debouncedSearchTerm);
+      let data = await response.json();
+      setSuggestions(data);
+    }
+  }
+  , [debouncedSearchTerm])
 
   return (
     <div className="min-h-screen bg-gray-50 py-6 flex flex-col justify-center relative overflow-hidden sm:py-12">
@@ -22,8 +49,8 @@ export default function Home() {
               
               <p className="text-gray-900">Autocomplete bellow for you convenience</p>
               <div className='pt-2 pb-2'>
-                <Autocomplete suggestions={suggestions} handleInputSelected={handleInputSelected}></Autocomplete>
-                <p className="text-right mt-2">Selected Value: {(inputSelected) ? inputSelected : "Empty"}</p>
+                <Autocomplete suggestions={suggestions} handleInputSelected={handleInputSelected} handleInputChanged={handleInputChanged} handleInputClear={handleInputClear}></Autocomplete>
+                <p className="text-right mt-2">Selected Value: {(inputSelected) ? `${inputSelected.name} - ${inputSelected.country} - ${inputSelected.subcountry}` : "Empty"}</p>
               </div>
             </div>
 
