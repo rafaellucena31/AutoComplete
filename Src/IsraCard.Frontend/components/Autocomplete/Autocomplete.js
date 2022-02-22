@@ -166,6 +166,9 @@ const Autocomplete = ({ suggestions, handleInputSelected, handleInputChanged, ha
                 <div>
                   <span className="">SubCountry: {suggestion.subcountry}</span>
                 </div>
+                <div>
+                  <span className="">Geonameid: {suggestion.geonameid}</span>
+                </div>
               </div>
           )
       }
