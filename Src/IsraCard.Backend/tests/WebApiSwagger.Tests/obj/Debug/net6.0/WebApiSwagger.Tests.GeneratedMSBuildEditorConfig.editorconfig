@@ -7,4 +7,4 @@ build_property.InvariantGlobalization =
 build_property.PlatformNeutralAssembly = 
 build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property.RootNamespace = WebApiSwagger.Tests
-build_property.ProjectDir = c:\temprpojects\src\isracardtest\Src\IsraCard.Backend\tests\WebApiSwagger.Tests\
+build_property.ProjectDir = c:\temprpojects\israproject\AutoComplete\Src\IsraCard.Backend\tests\WebApiSwagger.Tests\
