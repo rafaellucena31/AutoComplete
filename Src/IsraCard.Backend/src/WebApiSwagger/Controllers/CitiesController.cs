@@ -9,11 +9,6 @@ namespace WebApiSwagger.Controllers;
 [Route("api/v1/[controller]")]
 public class CitiesController : ControllerBase
 {
-    private static readonly string[] Summaries = new[]
-    {
-        "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-    };
-
     private readonly ILogger<CitiesController> _logger;
     private readonly IWorldCitiesSingleton _worldCitiesSingleton;
     
