@@ -26,6 +26,8 @@ public class CitiesController : ControllerBase
         {
             return _worldCitiesSingleton.getCities()
                 .Where(y => y.Name.ToLower().StartsWith(prefix.ToLower()))
+                .OrderBy(y => y.Name)
+                .Take(20)
                 .ToList();
         }
         else
