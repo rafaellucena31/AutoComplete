@@ -33,7 +33,8 @@ SAIDA = AQUI / "saida"
 FPS = 30
 TAXA = 48000
 
-INSTRUCAO_OPENAI = "Português do Brasil, tom calmo e didático."
+INSTRUCAO_OPENAI = os.environ.get(
+    "INSTRUCAO_OPENAI", "Português do Brasil, tom calmo e didático, em ritmo natural de conversa, sem pausas longas.")
 VOZES_OPENAI = ["marin", "cedar", "coral", "sage", "ash"]
 MODELO_OPENAI = "gpt-4o-mini-tts"
 PIPER_MODELO = Path(os.environ.get(
@@ -103,6 +104,13 @@ def falar(motor, voz, texto, destino):
         tts_openai(texto, destino, voz)
 
 
+def cortar_silencio(origem, destino, ritmo=1.0):
+    """Remove o silêncio do início e do fim (deixa 80 ms) e ajusta o ritmo sem mudar o tom."""
+    sil = "silenceremove=start_periods=1:start_threshold=-45dB:start_silence=0.08"
+    run(["ffmpeg", "-y", "-loglevel", "error", "-i", str(origem),
+         "-af", f"{sil},areverse,{sil},areverse,atempo={ritmo}", "-ac", "1", "-ar", str(TAXA), "-sample_fmt", "s16", str(destino)])
+
+
 def duracao_wav(p):
     with wave.open(str(p)) as w:
         return w.getnframes() / w.getframerate()
@@ -123,15 +131,20 @@ def amostras(motor):
         print("amostra:", pasta / nome)
 
 
-def narrar(motor, voz, lista):
-    pasta = BUILD / "audio" / f"{motor}-{voz}"
+def narrar(motor, voz, lista, ritmo=1.0):
+    sufixo = "-" + hashlib.sha1(INSTRUCAO_OPENAI.encode()).hexdigest()[:6] if motor == "openai" else ""
+    pasta = BUILD / "audio" / f"{motor}-{voz}{sufixo}"
     pasta.mkdir(parents=True, exist_ok=True)
     arquivos = []
     for i, f in enumerate(lista):
         h = hashlib.sha1(f["texto"].encode()).hexdigest()[:10]
-        wav = pasta / f"{i:02d}-{h}.wav"
+        wav = pasta / f"{h}.wav"
         if not wav.exists():
             falar(motor, voz, f["texto"], wav)
+        cortado = wav.with_name(f"{wav.stem}-cortado-{ritmo}.wav")
+        if not cortado.exists():
+            cortar_silencio(wav, cortado, ritmo)
+        wav = cortado
         arquivos.append(wav)
         print(f"áudio {i + 1}/{len(lista)}  {duracao_wav(wav):5.2f}s  {f['texto']}")
     return arquivos
@@ -209,6 +222,8 @@ def main():
     ap.add_argument("--motor", choices=["piper", "openai"], default="piper")
     ap.add_argument("--voz", help="voz da OpenAI (ex.: marin) ou velocidade do Piper (ex.: 1.0)")
     ap.add_argument("--nome", default="sua-jornada-seus-direitos")
+    ap.add_argument("--ritmo", type=float, default=None,
+                    help="acelera a narração sem mudar o tom (padrão: 1.15 na OpenAI, 1.0 no Piper)")
     a = ap.parse_args()
     if a.etapa == "amostras":
         return amostras(a.motor)
@@ -216,7 +231,8 @@ def main():
     if a.etapa == "quadros":
         return quadros(lista)
     voz = a.voz or ("1.0" if a.motor == "piper" else "marin")
-    audios = narrar(a.motor, voz, lista)
+    ritmo = a.ritmo or (1.15 if a.motor == "openai" else 1.0)
+    audios = narrar(a.motor, voz, lista, ritmo)
     pngs = quadros(lista)
     montar(lista, audios, pngs, a.nome)
 

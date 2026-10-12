@@ -6,7 +6,7 @@ Frase de teste (`frase-teste.txt`): tem palavras com som nasal ("não", "são",
 | Opção | Situação em 12/10/2026 |
 |---|---|
 | Piper `pt_BR-faber-medium` (gratuita, local) | Amostras em `amostras/` (velocidade 1.0 e 1.15). Preferida: **1.15**. Vídeo de exemplo em `video/saida/exemplo-piper-1.15.mp4`. |
-| OpenAI `gpt-4o-mini-tts` com a instrução "Português do Brasil, tom calmo e didático." | **Pendente.** A variável `OPENAI_API_KEY` não existe neste ambiente. |
+| OpenAI `gpt-4o-mini-tts` com a instrução "Português do Brasil, tom calmo e didático." | Amostras `openai-*.mp3` (marin, cedar, coral, sage, ash). **Escolhida: marin.** O vídeo final usa ritmo 1,15 (atempo) para caber em 3 minutos. |
 
 Vozes da OpenAI a testar: `marin` e `cedar` (recomendadas pela documentação),
 `coral`, `sage` e `ash`. Conferido em developers.openai.com em 12/10/2026.

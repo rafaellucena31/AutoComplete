@@ -1,7 +1,7 @@
 window.ROTEIRO = {
  "titulo": "Sua jornada, seus direitos",
- "pausa_entre_frases": 0.35,
- "pausa_fim_cena": 0.6,
+ "pausa_entre_frases": 0.3,
+ "pausa_fim_cena": 0.5,
  "cenas": [
   {
    "id": 1,
@@ -25,13 +25,6 @@ window.ROTEIRO = {
     },
     {
      "texto": "Se esses números não batem, este vídeo é para você.",
-     "visual": {
-      "tipo": "comparacao",
-      "passo": 3
-     }
-    },
-    {
-     "texto": "Em poucos minutos, você vai entender seus direitos de jornada.",
      "visual": {
       "tipo": "comparacao",
       "passo": 3
@@ -290,13 +283,6 @@ window.ROTEIRO = {
     },
     {
      "texto": "E só pode cobrar os últimos cinco anos, contados da data da ação.",
-     "visual": {
-      "tipo": "prazo",
-      "passo": 2
-     }
-    },
-    {
-     "texto": "Quem espera demais perde uma parte dos direitos.",
      "visual": {
       "tipo": "prazo",
       "passo": 3
