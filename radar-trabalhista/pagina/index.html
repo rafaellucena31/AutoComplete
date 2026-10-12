@@ -1,0 +1,632 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Radar Trabalhista</title>
+<meta name="description" content="Painel de conteúdo informativo sobre direitos trabalhistas: radar de notícias, tópicos de vídeo, publicações, agenda e vídeo interativo.">
+<style>
+@font-face{font-family:Oswald;font-weight:700;src:url(../video/fontes/oswald-latin-700-normal.woff2) format("woff2")}
+@font-face{font-family:Oswald;font-weight:500;src:url(../video/fontes/oswald-latin-500-normal.woff2) format("woff2")}
+@font-face{font-family:Mono;font-weight:500;src:url(../video/fontes/jetbrains-mono-latin-500-normal.woff2) format("woff2")}
+@font-face{font-family:Mono;font-weight:700;src:url(../video/fontes/jetbrains-mono-latin-700-normal.woff2) format("woff2")}
+@font-face{font-family:Inter;font-weight:400;src:url(../video/fontes/inter-latin-400-normal.woff2) format("woff2")}
+@font-face{font-family:Inter;font-weight:600;src:url(../video/fontes/inter-latin-600-normal.woff2) format("woff2")}
+@font-face{font-family:Inter;font-weight:700;src:url(../video/fontes/inter-latin-700-normal.woff2) format("woff2")}
+
+:root{
+  --fundo:#f5f3ec; --painel:#ffffff; --painel-2:#eef1f6; --texto:#14223a; --texto-2:#4c5a72;
+  --linha:#d8dde6; --azul:#13284a; --azul-txt:#fff; --ouro:#a87c12; --ouro-fundo:#f6ecd2;
+  --verde:#1d6b45; --verde-fundo:#e2f1e8; --vermelho:#9b2c2c; --vermelho-fundo:#f8e3e3;
+  --sombra:0 1px 2px rgba(20,34,58,.06),0 4px 16px rgba(20,34,58,.06);
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --fundo:#0d1a30; --painel:#13284a; --painel-2:#1a3359; --texto:#f1eee4; --texto-2:#b6c1d4;
+    --linha:#2b4874; --azul:#0a1528; --azul-txt:#f1eee4; --ouro:#e2bd5c; --ouro-fundo:#3a3220;
+    --verde:#7fd3a5; --verde-fundo:#173a2c; --vermelho:#f0a3a3; --vermelho-fundo:#432226;
+    --sombra:none; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --fundo:#0d1a30; --painel:#13284a; --painel-2:#1a3359; --texto:#f1eee4; --texto-2:#b6c1d4;
+  --linha:#2b4874; --azul:#0a1528; --azul-txt:#f1eee4; --ouro:#e2bd5c; --ouro-fundo:#3a3220;
+  --verde:#7fd3a5; --verde-fundo:#173a2c; --vermelho:#f0a3a3; --vermelho-fundo:#432226;
+  --sombra:none; color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--fundo);color:var(--texto);font:400 16px/1.55 Inter,system-ui,sans-serif}
+a{color:var(--ouro)}
+h1,h2,h3{font-family:Oswald,Impact,sans-serif;font-weight:700;line-height:1.1;margin:0}
+h2{font-size:28px;text-transform:uppercase;letter-spacing:.01em}
+h3{font-size:20px;font-weight:500;letter-spacing:.02em}
+.mono{font-family:Mono,ui-monospace,monospace}
+
+header{background:var(--azul);color:var(--azul-txt);border-bottom:3px solid var(--ouro)}
+.topo{max-width:1100px;margin:0 auto;padding:18px 16px 0;display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.marca h1{font-size:30px;text-transform:uppercase;letter-spacing:.03em}
+.marca h1 span{color:#e2bd5c}
+.marca p{margin:4px 0 0;color:#b6c1d4;font-size:14px}
+#tema{flex:none;background:transparent;color:inherit;border:1px solid rgba(255,255,255,.35);border-radius:999px;padding:8px 14px;font:600 14px Inter;cursor:pointer}
+nav{max-width:1100px;margin:0 auto;padding:14px 16px 0;display:flex;gap:4px;overflow-x:auto;scrollbar-width:none}
+nav::-webkit-scrollbar{display:none}
+nav button{flex:none;background:transparent;color:#b6c1d4;border:0;border-bottom:3px solid transparent;padding:10px 12px;font:600 15px Inter;cursor:pointer;margin-bottom:-3px;white-space:nowrap}
+nav button[aria-selected="true"]{color:#fff;border-bottom-color:#e2bd5c}
+nav button:focus-visible,button:focus-visible,summary:focus-visible,input:focus-visible{outline:3px solid #e2bd5c;outline-offset:2px}
+
+main{max-width:1100px;margin:0 auto;padding:24px 16px 64px}
+section[role="tabpanel"]{display:none}
+section[role="tabpanel"].ativo{display:block}
+.intro{color:var(--texto-2);margin:8px 0 20px;max-width:760px}
+.aviso{background:var(--ouro-fundo);border-left:4px solid var(--ouro);padding:12px 14px;border-radius:8px;margin:0 0 20px;font-size:14px}
+.cartao{background:var(--painel);border:1px solid var(--linha);border-radius:14px;padding:18px;box-shadow:var(--sombra);margin-bottom:16px;min-width:0}
+.grade{display:grid;gap:16px;grid-template-columns:repeat(auto-fill,minmax(300px,1fr))}
+.grade>.cartao{margin:0}
+.etiqueta{display:inline-block;font:600 12px Inter;text-transform:uppercase;letter-spacing:.05em;padding:3px 8px;border-radius:999px;background:var(--painel-2);color:var(--texto-2);margin:0 6px 6px 0}
+.etiqueta.ouro{background:var(--ouro-fundo);color:var(--ouro)}
+.etiqueta.verde{background:var(--verde-fundo);color:var(--verde)}
+.etiqueta.vermelho{background:var(--vermelho-fundo);color:var(--vermelho)}
+dl.ficha{display:grid;grid-template-columns:max-content 1fr;gap:4px 12px;margin:12px 0;font-size:14px}
+dl.ficha dt{color:var(--texto-2);font-weight:600}
+dl.ficha dd{margin:0;overflow-wrap:anywhere}
+.bloco{background:var(--painel-2);border-radius:10px;padding:12px 14px;margin:10px 0;font-size:15px}
+.bloco b{display:block;font:500 13px Oswald;text-transform:uppercase;letter-spacing:.06em;color:var(--ouro);margin-bottom:4px}
+.base{font-size:13px;color:var(--texto-2)}
+.base b{color:var(--ouro)}
+details{border-top:1px solid var(--linha);padding-top:10px;margin-top:10px}
+summary{cursor:pointer;font-weight:600}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:8px;border-bottom:1px solid var(--linha);vertical-align:top}
+th{font:500 13px Oswald;text-transform:uppercase;letter-spacing:.05em;color:var(--texto-2)}
+.tabela-rolagem{overflow-x:auto}
+.copiar{background:var(--azul);color:#fff;border:1px solid var(--ouro);border-radius:8px;padding:8px 14px;font:600 14px Inter;cursor:pointer}
+:root[data-theme="dark"] .copiar{background:var(--painel-2)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .copiar{background:var(--painel-2)}}
+.copiar.ok{background:var(--verde);border-color:var(--verde)}
+pre.texto{white-space:pre-wrap;font:400 15px/1.6 Inter;background:var(--painel-2);border-radius:10px;padding:14px;margin:12px 0 0;max-height:520px;overflow:auto}
+.cab-pub{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+
+/* tópicos */
+.serie{margin:28px 0 12px;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.serie span{color:var(--texto-2);font-size:14px}
+.topico h3{font-size:19px;margin-bottom:8px}
+.gancho{font-weight:600;border-left:3px solid var(--ouro);padding-left:10px;margin:10px 0}
+
+/* agenda */
+.dias{display:grid;gap:16px;grid-template-columns:repeat(auto-fill,minmax(310px,1fr))}
+.dia h3{font-size:22px}
+.dia .foco{color:var(--texto-2);font-size:14px;margin:2px 0 12px}
+.blocoh{display:grid;grid-template-columns:62px 1fr;gap:10px;padding:9px 0;border-top:1px solid var(--linha);font-size:14px}
+.blocoh .dur{font:700 14px Mono;color:var(--ouro)}
+.blocoh.auto{color:var(--texto-2)}
+.blocoh.auto .dur{color:var(--verde)}
+.soma{margin-top:8px;font:600 13px Inter;color:var(--texto-2);text-align:right}
+.legenda-agenda{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px;font-size:14px}
+
+/* vídeo interativo */
+.player{display:grid;gap:20px;grid-template-columns:minmax(0,420px) minmax(0,1fr);align-items:start}
+@media (max-width:820px){.player{grid-template-columns:1fr}}
+.tela{background:#13284a;color:#f3f0e6;border-radius:18px;aspect-ratio:9/16;padding:20px;position:relative;overflow:hidden;border:2px solid #d4ad4b;display:flex;flex-direction:column}
+.tela .prog{display:flex;gap:4px}
+.tela .prog button{flex:1;height:8px;border-radius:4px;border:0;background:rgba(255,255,255,.18);cursor:pointer;padding:0}
+.tela .prog button.feito{background:rgba(212,173,75,.55)}
+.tela .prog button.atual{background:#d4ad4b}
+.tela .cena-n{font:700 12px Oswald;letter-spacing:.16em;color:#d4ad4b;text-transform:uppercase;margin-top:14px}
+.tela h3{font:700 clamp(24px,6vw,34px)/1.05 Oswald;text-transform:uppercase;margin:6px 0 10px;color:#f3f0e6}
+.tela .corpo{flex:1;overflow:auto;font-size:14px;display:flex;flex-direction:column;justify-content:center;gap:8px;min-height:0}
+.tela .corpo .linha{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);border-radius:10px;padding:8px 10px}
+.tela .corpo .linha b{font-family:Mono;color:#ecd38a}
+.tela .base-t{font-size:11px;color:#b9c3d6;margin-top:8px}
+.tela .base-t b{color:#d4ad4b}
+.tela .leg{background:rgba(6,16,34,.85);border:1px solid rgba(212,173,75,.5);border-radius:12px;padding:10px 12px;font:600 15px/1.35 Inter;text-align:center;margin-top:10px;min-height:64px;display:flex;align-items:center;justify-content:center}
+.tela .rod{display:flex;justify-content:space-between;font-size:10px;color:#b9c3d6;margin-top:8px}
+.tela .rod span:last-child{color:#ecd38a}
+.controles{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.controles button{flex:1;min-width:90px;background:var(--painel);color:var(--texto);border:1px solid var(--linha);border-radius:10px;padding:10px;font:600 14px Inter;cursor:pointer}
+.controles button.prim{background:var(--azul);color:#fff;border-color:var(--ouro)}
+.frases{list-style:none;margin:0;padding:0}
+.frases li{padding:8px 10px;border-radius:8px;cursor:pointer;font-size:15px}
+.frases li.atual{background:var(--ouro-fundo);font-weight:600}
+.calc{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+.calc label{font-size:13px;font-weight:600;color:var(--texto-2);display:flex;flex-direction:column;gap:4px}
+.calc input{font:500 18px Mono;padding:10px;border-radius:8px;border:1px solid var(--linha);background:var(--painel-2);color:var(--texto);width:100%}
+.resultado{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));margin-top:14px}
+.resultado div{background:var(--painel-2);border-radius:10px;padding:12px}
+.resultado small{display:block;color:var(--texto-2);font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.04em}
+.resultado strong{font:700 22px Mono;color:var(--ouro)}
+.sinais label{display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--linha);cursor:pointer}
+.sinais input{width:22px;height:22px;accent-color:#b8901f;flex:none;margin-top:2px}
+.sinais .base{display:block}
+#res-sinais{margin-top:12px}
+footer{max-width:1100px;margin:0 auto;padding:0 16px 40px;color:var(--texto-2);font-size:13px}
+@media (max-width:520px){
+  h2{font-size:24px}
+  .marca h1{font-size:24px}
+  dl.ficha{grid-template-columns:1fr}
+  dl.ficha dt{margin-top:6px}
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="topo">
+    <div class="marca">
+      <h1>Radar <span>Trabalhista</span></h1>
+      <p>Conteúdo informativo sobre direitos do trabalhador · rascunhos para revisão</p>
+    </div>
+    <button id="tema" type="button" aria-label="Alternar tema claro e escuro">Tema</button>
+  </div>
+  <nav role="tablist" aria-label="Seções">
+    <button role="tab" id="t-radar" aria-controls="p-radar" aria-selected="true">Radar de hoje</button>
+    <button role="tab" id="t-topicos" aria-controls="p-topicos" aria-selected="false">Tópicos de vídeo</button>
+    <button role="tab" id="t-publicacoes" aria-controls="p-publicacoes" aria-selected="false">Publicações</button>
+    <button role="tab" id="t-agenda" aria-controls="p-agenda" aria-selected="false">Agenda</button>
+    <button role="tab" id="t-video" aria-controls="p-video" aria-selected="false">Vídeo interativo</button>
+  </nav>
+</header>
+
+<main>
+<p class="aviso"><strong>Rascunho para revisão.</strong> Todo conteúdo jurídico aqui precisa ser conferido antes de publicar. Limite ético: Provimento 205/2021 do CFOAB. Comente notícias públicas em tese. Não aborde trabalhadores de uma empresa específica, não ofereça serviço, não fale de honorários nem prometa resultado.</p>
+
+<!-- ============ RADAR ============ -->
+<section role="tabpanel" id="p-radar" aria-labelledby="t-radar" class="ativo">
+  <h2>Radar de hoje</h2>
+  <p class="intro" id="radar-janela"></p>
+  <div id="radar-itens"></div>
+  <div class="cartao">
+    <h3>Leis e propostas em votação</h3>
+    <div id="radar-leis"></div>
+  </div>
+  <div class="cartao">
+    <h3>O que não foi possível verificar</h3>
+    <ul id="radar-nv"></ul>
+  </div>
+  <div class="cartao">
+    <details>
+      <summary id="radar-desc-titulo">Itens descartados</summary>
+      <div class="tabela-rolagem"><table><thead><tr><th>Notícia</th><th>Motivo do descarte</th></tr></thead><tbody id="radar-desc"></tbody></table></div>
+    </details>
+  </div>
+</section>
+
+<!-- ============ TÓPICOS ============ -->
+<section role="tabpanel" id="p-topicos" aria-labelledby="t-topicos">
+  <h2>Tópicos de vídeo</h2>
+  <p class="intro">Dezessete tópicos em três séries. Cada um traz o gancho dos 3 primeiros segundos, a base legal e o formato sugerido. A série "Radar da semana" acompanha as notícias e muda toda semana.</p>
+  <div id="topicos"></div>
+</section>
+
+<!-- ============ PUBLICAÇÕES ============ -->
+<section role="tabpanel" id="p-publicacoes" aria-labelledby="t-publicacoes">
+  <h2>Publicações</h2>
+  <p class="intro">Cinco rascunhos sobre o mesmo tema do vídeo (jornada e hora extra), um para cada formato. Revise, ajuste ao seu jeito de falar e publique manualmente.</p>
+  <div id="publicacoes"></div>
+</section>
+
+<!-- ============ AGENDA ============ -->
+<section role="tabpanel" id="p-agenda" aria-labelledby="t-agenda">
+  <h2>Agenda da semana</h2>
+  <p class="intro">Três horas por dia, de segunda a sexta. O radar roda sozinho às 7h nos dias úteis. Todo dia começa com 20 minutos de leitura dele.</p>
+  <div class="legenda-agenda"><span class="etiqueta ouro">Seu tempo</span><span class="etiqueta verde">Automático (não conta nas 3h)</span></div>
+  <div class="dias" id="agenda"></div>
+</section>
+
+<!-- ============ VÍDEO ============ -->
+<section role="tabpanel" id="p-video" aria-labelledby="t-video">
+  <h2>Sua jornada, seus direitos</h2>
+  <p class="intro">Versão clicável do vídeo. Avance frase a frase ou toque numa cena. A calculadora e o checklist estão abaixo do player.</p>
+  <div class="player">
+    <div>
+      <div class="tela" id="tela" aria-live="polite">
+        <div class="prog" id="v-prog"></div>
+        <div class="cena-n" id="v-n"></div>
+        <h3 id="v-titulo"></h3>
+        <div class="corpo" id="v-corpo"></div>
+        <div class="base-t" id="v-base"></div>
+        <div class="leg" id="v-leg"></div>
+        <div class="rod"><span>Radar Trabalhista</span><span>Narração gerada por IA</span></div>
+      </div>
+      <div class="controles">
+        <button type="button" id="v-ant">◀ Anterior</button>
+        <button type="button" id="v-play" class="prim">▶ Reproduzir</button>
+        <button type="button" id="v-prox">Próxima ▶</button>
+      </div>
+    </div>
+    <div class="cartao" style="margin:0">
+      <h3 id="v-lista-titulo">Narração da cena</h3>
+      <ol class="frases" id="v-frases"></ol>
+    </div>
+  </div>
+
+  <div class="grade" style="margin-top:20px">
+    <div class="cartao" id="calculadora">
+      <h3>Calculadora de horas extras</h3>
+      <p class="base">Estimativa: salário ÷ 220 × (1 + adicional) × horas extras por semana × 30/7. Não inclui reflexos em descanso semanal, férias, 13º e FGTS. <b>Base legal:</b> CF, art. 7º, XVI; CLT, arts. 59, §1º, e 64.</p>
+      <div class="calc">
+        <label>Salário mensal (R$)<input id="c-sal" type="number" inputmode="decimal" min="0" step="0.01" value="2800"></label>
+        <label>Horas extras por semana<input id="c-he" type="number" inputmode="decimal" min="0" step="0.5" value="5"></label>
+        <label>Adicional (%)<input id="c-ad" type="number" inputmode="decimal" min="50" step="1" value="50"></label>
+        <label>Divisor mensal<input id="c-div" type="number" inputmode="numeric" min="1" step="1" value="220"></label>
+      </div>
+      <div class="resultado">
+        <div><small>Hora normal</small><strong id="r-hn">–</strong></div>
+        <div><small>Hora extra</small><strong id="r-he">–</strong></div>
+        <div><small>Por semana</small><strong id="r-sem">–</strong></div>
+        <div><small>Por mês (média)</small><strong id="r-mes">–</strong></div>
+      </div>
+      <p class="base" style="margin-top:12px">O divisor 220 vale para quem trabalha 44 horas por semana. A convenção coletiva pode prever um adicional maior que 50%. É só uma estimativa, não é um cálculo para processo.</p>
+    </div>
+    <div class="cartao">
+      <h3>Checklist: sinais de alerta</h3>
+      <p class="base">Marque o que acontece no seu trabalho. Nada é enviado nem salvo.</p>
+      <div class="sinais" id="sinais"></div>
+      <div id="res-sinais" class="bloco"></div>
+    </div>
+  </div>
+</section>
+</main>
+<footer>Radar Trabalhista · Conteúdo informativo, não substitui a orientação para um caso concreto. Em caso de dúvida, procure o seu sindicato, a Defensoria Pública ou um advogado de confiança.</footer>
+
+<script src="radar-hoje.js"></script>
+<script src="roteiro.js"></script>
+<script>
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const ORIENTA = 'Procure o seu sindicato, a Defensoria Pública ou um advogado de confiança.';
+const guardar = (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} };
+const ler = k => { try { return localStorage.getItem(k); } catch (e) { return null; } };
+
+/* ---------- tema ---------- */
+function aplicarTema(t){ if (t) document.documentElement.dataset.theme = t; else delete document.documentElement.dataset.theme; rotuloTema(); }
+function temaAtual(){ return document.documentElement.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'); }
+function rotuloTema(){ $('#tema').textContent = temaAtual() === 'dark' ? '☀ Tema claro' : '☾ Tema escuro'; }
+aplicarTema(ler('tema'));
+$('#tema').onclick = () => { const n = temaAtual() === 'dark' ? 'light' : 'dark'; guardar('tema', n); aplicarTema(n); };
+matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change', rotuloTema);
+
+/* ---------- abas ---------- */
+const abas = [...document.querySelectorAll('[role="tab"]')];
+function abrir(tab, foco){
+  abas.forEach(t => { const on = t === tab; t.setAttribute('aria-selected', on); t.tabIndex = on ? 0 : -1;
+    document.getElementById(t.getAttribute('aria-controls')).classList.toggle('ativo', on); });
+  if (foco) tab.focus();
+  guardar('aba', tab.id); history.replaceState(null, '', '#' + tab.id.slice(2));
+}
+abas.forEach((t, i) => { t.onclick = () => abrir(t);
+  t.onkeydown = e => { const d = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
+    if (d) { e.preventDefault(); abrir(abas[(i + d + abas.length) % abas.length], true); } }; });
+abrir(document.getElementById('t-' + location.hash.slice(1)) || document.getElementById(ler('aba')) || abas[0]);
+addEventListener('hashchange', () => { const t = document.getElementById('t-' + location.hash.slice(1)); if (t) abrir(t); });
+
+/* ---------- copiar ---------- */
+function copiar(btn, texto){
+  const ok = () => { const o = btn.textContent; btn.textContent = 'Copiado ✓'; btn.classList.add('ok');
+    setTimeout(() => { btn.textContent = o; btn.classList.remove('ok'); }, 1600); };
+  if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(texto).then(ok, () => fallback());
+  else fallback();
+  function fallback(){ const ta = document.createElement('textarea'); ta.value = texto; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); ok(); } catch (e) {} ta.remove(); }
+}
+document.addEventListener('click', e => { const b = e.target.closest('[data-copiar]'); if (b) copiar(b, document.getElementById(b.dataset.copiar).textContent); });
+
+/* ---------- radar ---------- */
+(function(){
+  const R = window.RADAR;
+  if (!R) { $('#radar-janela').textContent = 'Nenhum radar encontrado. Rode pagina/atualizar_dados.py depois da busca diária.'; return; }
+  const d = R.data.split('-').reverse().join('/');
+  $('#radar-janela').innerHTML = `<strong>${esc(d)}</strong> · ${R.itens.length} itens confirmados, ${R.descartados.length} descartados. ${esc(R.janela)}`;
+  $('#radar-itens').innerHTML = `<div class="grade">${R.itens.map((it, i) => `
+    <article class="cartao">
+      <span class="etiqueta ouro">${esc(it.setor)}</span>
+      <h3>${esc(it.empresa)}</h3>
+      <dl class="ficha">
+        <dt>Pessoas</dt><dd>${esc(it.pessoas)}</dd>
+        <dt>Local</dt><dd>${esc(it.local)}</dd>
+        <dt>Data do fato</dt><dd>${esc(it.data_fato)}</dd>
+        <dt>Publicação</dt><dd>${esc(it.data_publicacao)}</dd>
+        <dt>Direito em jogo</dt><dd>${esc(it.direito)}</dd>
+      </dl>
+      <p>${esc(it.resumo)}</p>
+      <div class="bloco"><b>Ângulo em tese</b>${esc(it.angulo)}</div>
+      <div class="bloco"><b>Gancho (3 s)</b>${esc(it.gancho)}</div>
+      <div class="bloco"><b>Rascunho de post</b><span id="post-${i}">${esc(it.post)}</span></div>
+      <button class="copiar" type="button" data-copiar="post-${i}">Copiar post</button>
+      <details><summary>Fonte e confirmação</summary>
+        <p class="base"><a href="${esc(it.fonte_url)}" target="_blank" rel="noopener">${esc(it.fonte_url)}</a></p>
+        <p class="base">${esc(it.veiculo)}</p><p class="base">${esc(it.confirmacao)}</p></details>
+    </article>`).join('')}</div>`;
+  $('#radar-leis').innerHTML = R.legislacao.map(l => `<div class="bloco"><b>${esc(l.data)}</b><strong>${esc(l.tema)}</strong><br>${esc(l.situacao)}<br><a class="base" href="${esc(l.fonte_url)}" target="_blank" rel="noopener">Fonte</a></div>`).join('');
+  $('#radar-nv').innerHTML = R.nao_verificado.map(x => `<li>${esc(x)}</li>`).join('');
+  $('#radar-desc-titulo').textContent = `Itens descartados (${R.descartados.length})`;
+  $('#radar-desc').innerHTML = R.descartados.map(x => `<tr><td><a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.titulo)}</a></td><td>${esc(x.motivo)}</td></tr>`).join('');
+})();
+
+/* ---------- tópicos ---------- */
+const SERIES = [
+ {nome:'Fui demitido, e agora?', desc:'Rescisão, prazos e proteções na dispensa', itens:[
+  ['Rescisão: o prazo de 10 dias','Sua rescisão atrasou? Conte os dias comigo.','CLT, art. 477, §§6º e 8º','Reel 30–60s','O pagamento deve ser feito em até 10 dias do fim do contrato. Se atrasar, a lei prevê multa de um salário.'],
+  ['O que entra nas verbas rescisórias','Demitido sem justa causa? Confira estes seis itens.','CLT, art. 477; CF, art. 7º, VIII e XVII; Lei 8.036/1990, art. 18, §1º','Carrossel','Saldo de salário, aviso prévio, férias + 1/3, 13º proporcional, multa de 40% do FGTS e guias.'],
+  ['Aviso prévio proporcional','Dez anos de casa não dão só trinta dias de aviso.','Lei 12.506/2011; CLT, art. 487','Reel 30–60s','30 dias + 3 por ano completo de serviço, até 90 dias.'],
+  ['Demissão em massa e o sindicato','Centenas demitidos no mesmo dia. O sindicato foi chamado?','CLT, art. 477-A; STF, Tema 638 (RE 999.435)','Vídeo técnico 3 min','O STF exige diálogo prévio com o sindicato antes da dispensa em massa, embora não seja preciso autorização.'],
+  ['PDV: antes de assinar','Aderiu ao PDV? Você pode ter dado quitação de tudo.','CLT, art. 477-B; STF, Tema 152','Vídeo técnico 3 min','Se o plano estiver previsto em acordo ou convenção coletiva, a adesão pode dar quitação plena. Leia antes de assinar.'],
+  ['Estabilidades na demissão','Grávida, da CIPA ou voltando de acidente? Cuidado com a demissão.','ADCT, art. 10, II, "a" e "b"; Lei 8.213/1991, art. 118; CLT, art. 543, §3º','Carrossel','Gestante, cipeiro, acidentado e dirigente sindical têm proteção contra dispensa sem justa causa.'],
+  ['Empresa em recuperação judicial','A empresa entrou em recuperação. E a minha rescisão?','CLT, art. 449; Lei 11.101/2005, arts. 54 e 83','Reel 30–60s','O crédito trabalhista continua existindo e tem prioridade. O plano deve pagá-lo em até 1 ano.']]},
+ {nome:'Minha jornada', desc:'Horas, pausas e controle de ponto', itens:[
+  ['Os limites da jornada','Oito por dia, quarenta e quatro por semana. E você?','CF, art. 7º, XIII; CLT, arts. 58 e 59','Reel 30–60s','Até 8h por dia e 44h por semana; no máximo 2 horas extras por dia.'],
+  ['Quanto vale sua hora extra','Sua hora extra vale quanto? Faça a conta comigo.','CF, art. 7º, XVI; CLT, arts. 59, §1º, e 64','Vídeo técnico 3 min','Salário ÷ 220 × 1,5. Exemplo: R$ 2.800 → R$ 19,09 por hora extra.'],
+  ['Ponto sempre igual','Seu ponto marca oito em ponto todo dia? Atenção.','CLT, art. 74, §2º; Súmula 338, III, do TST','Reel 30–60s','Cartão de ponto com horários sempre iguais não vale como prova, e a empresa passa a ter de provar a jornada.'],
+  ['Banco de horas','Banco de horas sem acordo vale?','CLT, art. 59, §§2º, 5º e 6º; Súmula 85 do TST','Carrossel','Anual só por norma coletiva; semestral por acordo individual escrito; mensal pode ser tácito.'],
+  ['Intervalo de almoço','Almoço de vinte minutos? A conta não fecha.','CLT, art. 71, caput e §4º; art. 611-A, III','Reel 30–60s','Mais de 6h: mínimo de 1h (norma coletiva pode reduzir a 30 min). Pausa cortada: o tempo que faltou é pago com 50% a mais.'],
+  ['Mensagens fora do horário','O chefe mandou mensagem às onze da noite. E agora?','CLT, art. 6º, parágrafo único; Súmula 428 do TST','Reel 30–60s','O comando por meios digitais equivale ao presencial. Ficar à disposição pode caracterizar sobreaviso, conforme o caso.']]},
+ {nome:'Radar da semana', desc:'Notícias do radar explicadas em tese (atualize toda semana)', itens:[
+  ['Quando uma medida fecha um setor inteiro','Uma canetada fechou um setor. E quem trabalhava lá?','CLT, arts. 139 e 140 e 477; STF, Tema 638','Vídeo técnico 3 min','Férias coletivas têm regras de aviso e duração; a dispensa continua gerando todas as verbas rescisórias.'],
+  ['Empresa endividada e a rescisão','A empresa está quebrada. E a minha rescisão?','CLT, art. 449; Lei 11.101/2005, arts. 54 e 83','Reel 30–60s','Dívida da empresa não apaga o crédito trabalhista, que tem prioridade na fila de pagamento.'],
+  ['Benefício que vem do acordo coletivo','Sua agência fechou. Existe indenização além da rescisão?','CF, art. 7º, XXVI; CLT, arts. 611-A e 620','Carrossel','Indenizações extras costumam nascer do acordo coletivo. Leia o da sua categoria.'],
+  ['Fim da escala 6x1: o que muda se passar','A semana de quarenta horas está chegando?','PEC 221/2019 (em tramitação); CF, art. 7º, XIII (texto vigente)','Reel 30–60s','Explique o que está em votação e o que vale hoje. Atualize assim que houver votação no Senado.']]}
+];
+$('#topicos').innerHTML = SERIES.map(s => `
+  <div class="serie"><h2>“${esc(s.nome)}”</h2><span>${esc(s.desc)} · ${s.itens.length} tópicos</span></div>
+  <div class="grade">${s.itens.map(([t, g, b, f, r]) => `
+    <article class="cartao topico">
+      <span class="etiqueta ${f.startsWith('Vídeo') ? 'verde' : f === 'Carrossel' ? 'ouro' : ''}">${esc(f)}</span>
+      <h3>${esc(t)}</h3>
+      <p class="gancho">“${esc(g)}”</p>
+      <p style="font-size:15px;margin:8px 0">${esc(r)}</p>
+      <p class="base"><b>Base legal:</b> ${esc(b)}</p>
+    </article>`).join('')}</div>`).join('');
+
+/* ---------- publicações ---------- */
+const PUBS = [
+ {nome:'Carrossel de Instagram', fmt:'8 slides · 1080×1350', texto:
+`SLIDE 1 (capa)
+Você trabalha mais do que aparece no holerite?
+6 sinais de alerta na sua jornada →
+
+SLIDE 2
+A regra geral
+• Até 8 horas por dia e 44 por semana
+• No máximo 2 horas extras por dia
+• 11 horas de descanso entre um dia e outro
+Base legal: CF, art. 7º, XIII; CLT, arts. 58, 59 e 66
+
+SLIDE 3
+Hora extra vale, no mínimo, 50% a mais
+Exemplo: salário de R$ 2.800,00
+R$ 2.800 ÷ 220 = R$ 12,73 por hora
+R$ 12,73 × 1,5 = R$ 19,09 por hora extra
+Base legal: CF, art. 7º, XVI; CLT, art. 59, §1º
+
+SLIDE 4
+5 horas extras por semana ≈ R$ 409 por mês
+E ainda reflete no descanso semanal, nas férias, no 13º e no FGTS.
+Base legal: Súmulas 45, 63 e 172 do TST
+
+SLIDE 5
+Sinais de alerta (1 a 3)
+☐ O ponto marca sempre o mesmo horário, ao minuto
+☐ Você bate a saída e continua trabalhando
+☐ Cobranças de trabalho à noite e no fim de semana
+Base legal: Súmula 338, III, do TST; CLT, art. 6º, parágrafo único
+
+SLIDE 6
+Sinais de alerta (4 a 6)
+☐ Banco de horas sem acordo escrito nem convenção coletiva
+☐ Almoço bem mais curto do que deveria
+☐ Parte do salário paga "por fora"
+Base legal: CLT, arts. 59, §§2º e 5º, 71 e 457
+
+SLIDE 7
+O que fazer agora
+1. Anote seus horários reais de entrada e saída
+2. Guarde holerites, mensagens e fotos do ponto
+3. Atenção ao prazo: até 2 anos após sair da empresa
+Base legal: CF, art. 7º, XXIX
+
+SLIDE 8
+Ficou com dúvida sobre o seu caso?
+${ORIENTA}
+Conteúdo informativo. Não substitui orientação individual.
+
+LEGENDA
+Hora extra não é favor: é direito previsto na Constituição. Salve este post para conferir seus horários e mande para quem precisa ler. ${ORIENTA}
+#direitotrabalhista #horaextra #jornadadetrabalho #direitosdotrabalhador #CLT`},
+ {nome:'Roteiro de Reel', fmt:'45 segundos · vertical', texto:
+`TEMA: Ponto sempre igual
+
+[00:00–00:03] GANCHO
+Fala: "Seu ponto marca oito em ponto todo santo dia? Presta atenção."
+Texto na tela: PONTO SEMPRE IGUAL?
+
+[00:03–00:12]
+Fala: "O registro de ponto tem que mostrar a hora real em que você entra e sai. Empresa com mais de vinte empregados é obrigada a ter esse controle."
+Texto na tela: Mais de 20 empregados = controle obrigatório
+Base legal: CLT, art. 74, §2º
+
+[00:12–00:25]
+Fala: "Quando os horários são sempre idênticos, o TST entende que o cartão não vale como prova. Aí quem precisa provar a jornada é a empresa."
+Texto na tela: Ponto "britânico" não vale como prova
+Base legal: Súmula 338, III, do TST
+
+[00:25–00:38]
+Fala: "Então anote seus horários de verdade, guarde mensagens e holerites. Lembre: depois de sair da empresa, o prazo para cobrar é de dois anos."
+Texto na tela: Anote · Guarde · Fique atento ao prazo
+Base legal: CF, art. 7º, XXIX
+
+[00:38–00:45] FECHAMENTO
+Fala: "Dúvida no seu caso? Procure seu sindicato, a Defensoria Pública ou um advogado de confiança."
+Texto na tela: Conteúdo informativo
+
+LEGENDA DO POST
+Ponto sempre igual, ao minuto, é sinal de alerta. Entenda por quê. ${ORIENTA}
+#horaextra #pontobritanico #direitotrabalhista`},
+ {nome:'Post longo de Facebook', fmt:'≈ 300 palavras', texto:
+`TRABALHOU DEPOIS DO HORÁRIO E NÃO RECEBEU? ENTENDA A HORA EXTRA
+
+Muita gente trabalha nove, dez horas por dia, mas o holerite mostra só oito. Vamos entender o que diz a lei.
+
+📌 O limite
+A Constituição fixa a jornada em até 8 horas por dia e 44 horas por semana. A CLT permite, como exceção, até 2 horas extras por dia. (CF, art. 7º, XIII; CLT, arts. 58 e 59)
+
+📌 Quanto vale
+A hora extra vale, no mínimo, 50% a mais que a hora normal. A convenção coletiva da sua categoria pode prever um percentual maior. (CF, art. 7º, XVI; CLT, art. 59, §1º)
+
+Exemplo: com salário de R$ 2.800,00, a hora normal fica em cerca de R$ 12,73 (dividindo por 220). A hora extra vale R$ 19,09. Quem faz 5 horas extras por semana deveria receber, em média, uns R$ 409 a mais por mês, fora os reflexos em férias, 13º e FGTS.
+
+📌 Sinais de alerta
+• ponto que marca sempre o mesmo horário (Súmula 338, III, do TST);
+• trabalhar depois de bater a saída;
+• mensagens e cobranças à noite e no fim de semana (CLT, art. 6º, parágrafo único);
+• banco de horas sem acordo (CLT, art. 59, §§2º e 5º);
+• almoço bem mais curto que uma hora, em jornada acima de 6 horas (CLT, art. 71);
+• parte do salário paga "por fora".
+
+📌 E o prazo?
+Depois que o contrato termina, você tem até 2 anos para entrar com a ação, e ela alcança os últimos 5 anos. (CF, art. 7º, XXIX; CLT, art. 11)
+
+O primeiro passo é simples: anote seus horários reais e guarde holerites e mensagens.
+
+${ORIENTA}
+
+Este conteúdo é informativo e não substitui a orientação para um caso concreto.`},
+ {nome:'Sequência de Stories', fmt:'6 telas · com enquete e quiz', texto:
+`STORY 1 — ENQUETE
+Texto: "Seu ponto mostra a hora REAL que você trabalha?"
+Enquete: [Sempre] [Nem sempre]
+
+STORY 2 — INFORMAÇÃO
+Texto: "A regra: até 8h por dia e 44h por semana. Hora extra: no máximo 2 por dia."
+Rodapé: CF, art. 7º, XIII; CLT, arts. 58 e 59
+
+STORY 3 — QUIZ
+Pergunta: "A hora extra vale, no mínimo, quanto a mais?"
+Opções: [20%] [50% ✓] [100%]
+
+STORY 4 — RESPOSTA
+Texto: "50%! Com salário de R$ 2.800, cada hora extra vale cerca de R$ 19,09."
+Rodapé: CF, art. 7º, XVI; CLT, art. 59, §1º
+
+STORY 5 — CAIXINHA DE PERGUNTAS
+Texto: "Qual dúvida você tem sobre jornada? Respondo em tese, num vídeo, sem analisar casos."
+Caixinha: "Minha dúvida sobre jornada é..."
+
+STORY 6 — FECHAMENTO
+Texto: "Anote seus horários reais e guarde as provas. ${ORIENTA}"
+Figurinha: link para o post do carrossel ("Veja os 6 sinais de alerta")`},
+ {nome:'Texto de LinkedIn', fmt:'≈ 220 palavras', texto:
+`Jornada de trabalho: seis sinais de alerta que todo profissional deveria conhecer
+
+Em conversas sobre carreira, quase ninguém fala do básico: as horas que você trabalha estão registradas e pagas corretamente?
+
+A regra vigente hoje é de até 8 horas diárias e 44 semanais, com no máximo 2 horas extras por dia, pagas com adicional mínimo de 50% (CF, art. 7º, XIII e XVI; CLT, arts. 58 e 59). Vale acompanhar: está em votação no Senado a PEC 221/2019, que propõe reduzir a jornada semanal e acabar com a escala 6x1. Por enquanto, nada mudou.
+
+Seis sinais que merecem atenção:
+1. Ponto com horários sempre idênticos. O TST não aceita esse registro como prova (Súmula 338, III).
+2. Trabalho depois de registrar a saída.
+3. Demandas por aplicativo à noite e no fim de semana. A lei equipara o comando digital ao presencial (CLT, art. 6º, parágrafo único).
+4. Banco de horas sem acordo individual escrito ou norma coletiva (CLT, art. 59, §§2º e 5º).
+5. Intervalo menor que o mínimo legal (CLT, art. 71).
+6. Parte da remuneração paga fora da folha.
+
+Registrar a própria jornada é um hábito simples que protege qualquer profissional.
+
+${ORIENTA}
+
+Conteúdo informativo, sem análise de casos concretos.
+#DireitoDoTrabalho #Jornada #CLT #Carreira`}
+];
+$('#publicacoes').innerHTML = PUBS.map((p, i) => `
+  <article class="cartao">
+    <div class="cab-pub"><div><h3>${esc(p.nome)}</h3><span class="base">${esc(p.fmt)}</span></div>
+    <button class="copiar" type="button" data-copiar="pub-${i}">Copiar texto</button></div>
+    <pre class="texto" id="pub-${i}">${esc(p.texto)}</pre>
+  </article>`).join('');
+
+/* ---------- agenda ---------- */
+const A = (dur, txt) => ({dur, txt}), AUTO = txt => ({dur:0, txt, auto:true});
+const AGENDA = [
+ {dia:'Segunda', foco:'Planejar e roteirizar', b:[AUTO('7h: o radar roda e salva o resumo no repositório'), A(20,'Ler o radar e marcar as notícias que viram pauta'), A(40,'Escolher os tópicos da semana (1 de cada série)'), A(30,'Conferir a base legal de cada tópico na fonte oficial'), A(70,'Roteirizar 4 Reels e 1 vídeo técnico'), A(20,'Passar os roteiros pelo checklist do Provimento 205/2021')]},
+ {dia:'Terça', foco:'Gravar em lote', b:[AUTO('7h: radar do dia'), A(20,'Ler o radar'), A(20,'Preparar luz, celular e roteiros impressos'), A(100,'Gravar em lote 4 Reels (2 ou 3 tomadas cada)'), A(40,'Escolher as melhores tomadas e conferir as legendas')]},
+ {dia:'Quarta', foco:'Notícia quente e carrossel', b:[AUTO('7h: radar do dia'), AUTO('Rascunho de post e gancho para cada notícia já vêm no radar'), A(20,'Ler o radar e escolher a notícia da semana'), A(50,'Revisar o ângulo em tese e gravar o Reel da notícia'), A(60,'Montar o carrossel (revisar os textos dos slides)'), A(30,'Montar os Stories com enquete'), A(20,'Responder comentários com orientação geral, sem analisar casos')]},
+ {dia:'Quinta', foco:'Vídeo técnico narrado', b:[AUTO('7h: radar do dia'), AUTO('O script gera narração, quadros e MP4 a partir do roteiro'), A(20,'Ler o radar'), A(40,'Revisar o roteiro do vídeo técnico e a base legal'), A(30,'Rodar o script e assistir ao vídeo inteiro'), A(50,'Ajustar frases e gerar de novo; conferir legendas e pronúncia'), A(40,'Adaptar o tema para o texto do LinkedIn')]},
+ {dia:'Sexta', foco:'Métricas e agendamento', b:[AUTO('7h: radar do dia'), A(20,'Ler o radar'), A(40,'Ver métricas: alcance, salvamentos e dúvidas recorrentes'), A(60,'Agendar as publicações da próxima semana em cada rede'), A(40,'Revisão final de conformidade: base legal vigente, sem captação'), A(20,'Anotar ideias novas no banco de pautas')]}
+];
+$('#agenda').innerHTML = AGENDA.map(d => {
+  const total = d.b.reduce((s, x) => s + x.dur, 0);
+  return `<article class="cartao dia"><h3>${d.dia}</h3><p class="foco">${esc(d.foco)}</p>
+    ${d.b.map(x => `<div class="blocoh ${x.auto ? 'auto' : ''}"><span class="dur">${x.auto ? 'auto' : x.dur + ' min'}</span><span>${esc(x.txt)}</span></div>`).join('')}
+    <div class="soma">Seu tempo: ${Math.floor(total/60)}h${total%60 ? String(total%60).padStart(2,'0') : ''}</div></article>`;
+}).join('');
+
+/* ---------- vídeo interativo ---------- */
+const ROT = window.ROTEIRO, CENAS = ROT.cenas;
+const VIS = {
+  comparacao:p=>[['Na vida real','10h por dia?',1],['No holerite','8h por dia',2],['Resultado','10 ≠ 8: as contas precisam fechar',3]].filter(x=>p>=x[2]),
+  numeros:p=>[['Por dia','8h',1],['Por semana','44h',1],['Extras por dia (máx.)','2h',2],['Descanso entre jornadas','11h',3],['Folga semanal','24h seguidas',4]].filter(x=>p>=x[2]),
+  conta:p=>[['Adicional mínimo','+50%',0],['Salário','R$ 2.800,00',1],['÷ 220','R$ 12,73 por hora',2],['× 1,5','R$ 19,09 por hora extra',3],['× 5h × 30/7','≈ R$ 409,09 por mês',4],['Reflexos','DSR, férias + 1/3, 13º e FGTS',5]].filter(x=>p>=x[2]),
+  intervalo:p=>[['Mais de 6h','1h a 2h de pausa',1],['Mais de 4h até 6h','15 min de pausa',2],['Norma coletiva','mínimo de 30 min',3],['Pausa cortada','tempo que faltou + 50%',4]].filter(x=>p>=x[2]),
+  checklist:m=>['Ponto sempre igual, ao minuto','Trabalho depois de bater a saída','Cobranças à noite e no fim de semana','Banco de horas sem acordo','Almoço curto demais','Salário “por fora”'].map((t,i)=>[i<m?'☑':'☐',t]),
+  rescisao:p=>[['01','Saldo de salário',1],['02','Aviso prévio',2],['03','Férias + 1/3',3],['04','13º proporcional',4],['05','Multa de 40% do FGTS',5],['06','Guias: FGTS e seguro-desemprego',6],['Aviso','30 + 3 por ano, até 90 dias',7],['Prazo','10 dias para pagar',8]].filter(x=>p>=x[2]),
+  prazo:p=>[['Saiu da empresa','até 2 anos para entrar com a ação',1],['A ação alcança','os últimos 5 anos',2],['Atenção','esperar custa direitos',3]].filter(x=>p>=x[2]),
+  passos:p=>[['01','Anote seus horários reais',1],['02','Guarde holerites, mensagens e fotos do ponto',2],['03','Procure sindicato, Defensoria Pública ou advogado de confiança',3],['ℹ','Conteúdo informativo, não substitui orientação para o seu caso',4]].filter(x=>p>=x[2])
+};
+let ci = 0, fi = 0, timer = null;
+function desenhar(){
+  const c = CENAS[ci], f = c.frases[fi], v = f.visual;
+  $('#v-prog').innerHTML = CENAS.map((x, i) => `<button type="button" aria-label="Cena ${i+1}: ${esc(x.nome)}" class="${i<ci?'feito':''} ${i==ci?'atual':''}" data-cena="${i}"></button>`).join('');
+  $('#v-n').textContent = `Cena ${ci+1} de ${CENAS.length} · ${c.nome}`;
+  $('#v-titulo').textContent = c.titulo;
+  const linhas = VIS[v.tipo](v.tipo === 'checklist' ? v.marcados : v.passo);
+  $('#v-corpo').innerHTML = linhas.map(l => `<div class="linha"><b>${esc(l[0])}</b> ${esc(l[1])}</div>`).join('');
+  $('#v-base').innerHTML = `<b>Base legal:</b> ${esc(c.base_legal)}`;
+  $('#v-leg').textContent = f.texto;
+  $('#v-lista-titulo').textContent = `Narração · cena ${ci+1}`;
+  $('#v-frases').innerHTML = c.frases.map((x, i) => `<li class="${i==fi?'atual':''}" data-frase="${i}">${esc(x.texto)}</li>`).join('');
+}
+function passo(d){
+  fi += d;
+  if (fi >= CENAS[ci].frases.length) { if (ci < CENAS.length - 1) { ci++; fi = 0; } else { fi--; parar(); } }
+  if (fi < 0) { if (ci > 0) { ci--; fi = CENAS[ci].frases.length - 1; } else fi = 0; }
+  desenhar();
+}
+function parar(){ clearTimeout(timer); timer = null; $('#v-play').textContent = '▶ Reproduzir'; }
+function tocar(){ const f = CENAS[ci].frases[fi]; const ms = 1200 + f.texto.length * 55;
+  timer = setTimeout(() => { if (ci === CENAS.length - 1 && fi === CENAS[ci].frases.length - 1) return parar(); passo(1); tocar(); }, ms); }
+$('#v-play').onclick = () => { if (timer) parar(); else { $('#v-play').textContent = '❚❚ Pausar'; tocar(); } };
+$('#v-prox').onclick = () => { parar(); passo(1); };
+$('#v-ant').onclick = () => { parar(); passo(-1); };
+$('#v-prog').onclick = e => { const b = e.target.closest('[data-cena]'); if (b) { parar(); ci = +b.dataset.cena; fi = 0; desenhar(); } };
+$('#v-frases').onclick = e => { const li = e.target.closest('[data-frase]'); if (li) { parar(); fi = +li.dataset.frase; desenhar(); } };
+desenhar();
+
+/* calculadora */
+const brl = n => isFinite(n) ? n.toLocaleString('pt-BR', {style:'currency', currency:'BRL'}) : '–';
+function calcular(){
+  const sal = +$('#c-sal').value, he = +$('#c-he').value, ad = +$('#c-ad').value, dv = +$('#c-div').value;
+  const hn = dv > 0 ? sal / dv : NaN, hx = hn * (1 + ad / 100);
+  $('#r-hn').textContent = brl(hn); $('#r-he').textContent = brl(hx);
+  $('#r-sem').textContent = brl(hx * he); $('#r-mes').textContent = brl(hx * he * 30 / 7);
+}
+document.querySelectorAll('.calc input').forEach(i => i.addEventListener('input', calcular)); calcular();
+
+/* checklist */
+const SINAIS = [
+ ['O ponto marca sempre o mesmo horário, todo dia, ao minuto','Súmula 338, III, do TST'],
+ ['Você bate a saída e continua trabalhando','CLT, arts. 58, 59 e 74, §2º'],
+ ['Recebe cobranças de trabalho à noite e no fim de semana','CLT, art. 6º, parágrafo único; Súmula 428 do TST'],
+ ['Existe banco de horas, mas sem acordo assinado nem convenção coletiva','CLT, art. 59, §§2º, 5º e 6º'],
+ ['O almoço dura bem menos do que deveria','CLT, art. 71'],
+ ['Parte do salário é paga "por fora", sem aparecer no holerite','CLT, art. 457, §1º']
+];
+$('#sinais').innerHTML = SINAIS.map(([t, b], i) => `<label><input type="checkbox" data-s="${i}"><span>${esc(t)}<span class="base">${esc(b)}</span></span></label>`).join('');
+function avaliar(){
+  const n = document.querySelectorAll('#sinais input:checked').length;
+  $('#res-sinais').innerHTML = n === 0
+    ? '<b>Nenhum sinal marcado</b>Continue anotando seus horários reais. É um bom hábito.'
+    : `<b>${n} ${n === 1 ? 'sinal marcado' : 'sinais marcados'}</b>Anote seus horários reais e guarde holerites, mensagens e fotos do ponto. ${ORIENTA} Lembre: o prazo para cobrar é de até 2 anos após o fim do contrato.`;
+}
+$('#sinais').addEventListener('change', avaliar); avaliar();
+</script>
+</body>
+</html>

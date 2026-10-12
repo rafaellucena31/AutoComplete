@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<style>
+@font-face{font-family:Oswald;font-weight:700;src:url(fontes/oswald-latin-700-normal.woff2)}
+@font-face{font-family:Oswald;font-weight:500;src:url(fontes/oswald-latin-500-normal.woff2)}
+@font-face{font-family:Mono;font-weight:500;src:url(fontes/jetbrains-mono-latin-500-normal.woff2)}
+@font-face{font-family:Mono;font-weight:700;src:url(fontes/jetbrains-mono-latin-700-normal.woff2)}
+@font-face{font-family:Inter;font-weight:400;src:url(fontes/inter-latin-400-normal.woff2)}
+@font-face{font-family:Inter;font-weight:600;src:url(fontes/inter-latin-600-normal.woff2)}
+@font-face{font-family:Inter;font-weight:700;src:url(fontes/inter-latin-700-normal.woff2)}
+:root{
+  --azul:#13284a; --azul-2:#1b3762; --azul-3:#24467a; --linha:#33568c;
+  --ouro:#d4ad4b; --ouro-claro:#ecd38a; --texto:#f3f0e6; --texto-2:#b9c3d6;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:1080px;height:1920px;overflow:hidden}
+body{background:var(--azul);color:var(--texto);font-family:Inter,sans-serif;position:relative}
+/* textura discreta de capa de documento */
+body::before{content:"";position:absolute;inset:0;
+  background:repeating-linear-gradient(45deg,rgba(255,255,255,.018) 0 2px,transparent 2px 9px),
+             radial-gradient(ellipse at 50% 30%,rgba(255,255,255,.06),transparent 65%)}
+.moldura{position:absolute;inset:36px;border:3px solid rgba(212,173,75,.55);border-radius:18px}
+.moldura::after{content:"";position:absolute;inset:10px;border:1px solid rgba(212,173,75,.3);border-radius:12px}
+
+#progresso{position:absolute;top:88px;left:90px;right:90px;display:flex;gap:10px}
+#progresso .seg{flex:1}
+#progresso .barra{height:12px;border-radius:6px;background:rgba(255,255,255,.14)}
+#progresso .seg.feito .barra{background:rgba(212,173,75,.55)}
+#progresso .seg.atual .barra{background:var(--ouro);box-shadow:0 0 18px rgba(212,173,75,.6)}
+#progresso .rot{font:500 19px/1 Oswald;letter-spacing:.04em;text-transform:uppercase;color:var(--texto-2);margin-top:12px;text-align:center;white-space:nowrap}
+#progresso .seg.atual .rot{color:var(--ouro-claro)}
+
+#cabeca{position:absolute;top:190px;left:90px;right:90px}
+#marca{font:700 26px/1 Oswald;letter-spacing:.18em;color:var(--ouro);text-transform:uppercase}
+#titulo{font:700 92px/1.02 Oswald;text-transform:uppercase;margin-top:18px;color:var(--texto)}
+
+#conteudo{position:absolute;top:470px;left:90px;right:90px;height:760px;display:flex;flex-direction:column;justify-content:center;gap:22px}
+#base{position:absolute;top:1240px;left:90px;right:90px;font:400 25px/1.35 Inter;color:var(--texto-2)}
+#base b{color:var(--ouro);font-weight:600}
+
+#legenda{position:absolute;top:1318px;left:70px;right:70px;height:300px;display:flex;align-items:center;justify-content:center}
+#legenda .caixa{background:rgba(6,16,34,.82);border:2px solid rgba(212,173,75,.5);border-radius:22px;padding:28px 38px;
+  font:600 52px/1.3 Inter;text-align:center;color:#fff;max-height:300px}
+#rodape{position:absolute;top:1660px;left:90px;right:90px;display:flex;justify-content:space-between;font:400 24px/1.3 Inter;color:var(--texto-2)}
+#rodape .ia{color:var(--ouro-claro);font-weight:600}
+
+/* blocos */
+.card{background:var(--azul-2);border:2px solid var(--linha);border-radius:22px;padding:30px 36px}
+.card.ouro{border-color:var(--ouro);background:linear-gradient(180deg,rgba(212,173,75,.16),rgba(212,173,75,.05))}
+.rot{font:500 30px/1.2 Oswald;letter-spacing:.06em;text-transform:uppercase;color:var(--texto-2)}
+.mono{font-family:Mono;font-weight:700}
+.big{font:700 120px/1 Mono;color:var(--ouro)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+.tile{background:var(--azul-2);border:2px solid var(--linha);border-radius:22px;padding:26px 30px;min-height:190px}
+.tile .n{font:700 92px/1 Mono;color:var(--ouro)}
+.tile .n small{font-size:40px;color:var(--ouro-claro)}
+.tile .d{font:600 32px/1.25 Inter;margin-top:12px}
+.oculto{opacity:.16}
+.linha-conta{font:700 50px/1.25 Mono;color:var(--texto)}
+.linha-conta em{font-style:normal;color:var(--ouro)}
+.linha-conta .op{color:var(--texto-2)}
+.pequeno{font:400 30px/1.35 Inter;color:var(--texto-2)}
+.check{display:flex;align-items:center;gap:26px;font:600 40px/1.2 Inter;padding:20px 26px;border-radius:18px;background:var(--azul-2);border:2px solid var(--linha)}
+.check .box{flex:none;width:62px;height:62px;border-radius:12px;border:4px solid var(--texto-2);display:flex;align-items:center;justify-content:center;font:700 46px/1 Inter;color:var(--azul)}
+.check.on{border-color:var(--ouro)}
+.check.on .box{background:var(--ouro);border-color:var(--ouro)}
+.check.on .box::after{content:"✓"}
+.check.atual{box-shadow:0 0 0 4px rgba(212,173,75,.35)}
+.item{display:flex;gap:22px;align-items:center;font:600 40px/1.25 Inter;padding:16px 0;border-bottom:2px solid var(--linha)}
+.item .num{font:700 38px/1 Mono;color:var(--ouro);width:64px}
+.bar{height:56px;border-radius:12px;background:var(--azul-3);position:relative;overflow:hidden}
+.bar .f{position:absolute;top:0;bottom:0;left:0;background:var(--ouro)}
+</style>
+</head>
+<body>
+<div class="moldura"></div>
+<div id="progresso"></div>
+<div id="cabeca"><div id="marca"></div><div id="titulo"></div></div>
+<div id="conteudo"></div>
+<div id="base"></div>
+<div id="legenda"><div class="caixa" id="frase"></div></div>
+<div id="rodape"><span>Radar Trabalhista · conteúdo informativo</span><span class="ia">Narração gerada por IA</span></div>
+<script>
+const v = (on, html) => on ? html : html.replace(/class="/, 'class="oculto ');
+const VIS = {
+  comparacao(p){return `
+    <div class="card"><div class="rot">Na vida real</div><div class="big">10h<span class="pequeno"> /dia?</span></div></div>
+    ${v(p>=2,`<div class="card"><div class="rot">No holerite</div><div class="big">8h<span class="pequeno"> /dia</span></div></div>`)}
+    ${v(p>=3,`<div class="card ouro" style="text-align:center"><div class="big" style="font-size:100px">10 ≠ 8</div><div class="pequeno" style="margin-top:10px">As contas precisam fechar</div></div>`)}`},
+  numeros(p){const t=[[1,'8<small>h</small>','por dia'],[1,'44<small>h</small>','por semana'],[2,'+2<small>h</small>','extras, no máximo, por dia'],[3,'11<small>h</small>','de descanso entre jornadas'],[4,'24<small>h</small>','seguidas de folga semanal']];
+    return `<div class="grid">${t.map(([s,n,d],i)=>v(p>=s,`<div class="tile" ${i==4?'style="grid-column:1/3"':''}><div class="n">${n}</div><div class="d">${d}</div></div>`)).join('')}</div>`},
+  conta(p){return `
+    <div class="card ouro" style="text-align:center"><div class="rot">Adicional mínimo</div><div class="big">+50%</div></div>
+    ${v(p>=1,`<div class="linha-conta">Salário <em>R$ 2.800,00</em></div>`)}
+    ${v(p>=2,`<div class="linha-conta"><span class="op">÷ 220 =</span> <em>R$ 12,73</em> <span class="pequeno">/hora</span></div>`)}
+    ${v(p>=3,`<div class="linha-conta"><span class="op">× 1,5 =</span> <em>R$ 19,09</em> <span class="pequeno">/hora extra</span></div>`)}
+    ${v(p>=4,`<div class="linha-conta"><span class="op">× 5h × 30/7 ≈</span> <em>R$ 409,09</em> <span class="pequeno">/mês</span></div>`)}
+    ${v(p>=5,`<div class="pequeno">+ reflexos no descanso semanal, férias + 1/3, 13º e FGTS</div>`)}`},
+  intervalo(p){return `<style>#conteudo .card{padding:18px 30px}#conteudo .linha-conta{font-size:44px}#conteudo{gap:18px}</style>
+    ${v(p>=1,`<div class="card"><div class="rot">Mais de 6h de trabalho</div><div class="bar" style="height:34px;margin:12px 0 8px"><div class="f" style="width:50%"></div></div><div class="linha-conta"><em>1h</em> a <em>2h</em> de pausa</div></div>`)}
+    ${v(p>=2,`<div class="card"><div class="rot">Mais de 4h até 6h</div><div class="bar" style="height:34px;margin:12px 0 8px"><div class="f" style="width:12.5%"></div></div><div class="linha-conta"><em>15 min</em> de pausa</div></div>`)}
+    ${v(p>=3,`<div class="card"><div class="rot">Norma coletiva</div><div class="linha-conta" style="margin-top:8px">mínimo de <em>30 min</em></div></div>`)}
+    ${v(p>=4,`<div class="card ouro"><div class="rot">Pausa cortada?</div><div class="linha-conta" style="margin-top:8px">tempo que faltou <em>+50%</em></div></div>`)}`},
+  checklist(m){const it=['Ponto sempre igual, ao minuto','Trabalho depois de bater a saída','Cobranças à noite e no fim de semana','Banco de horas sem acordo','Almoço curto demais','Salário “por fora”'];
+    return it.map((t,i)=>`<div class="check ${i<m?'on':''} ${i==m-1?'atual':''}"><div class="box"></div><div>${t}</div></div>`).join('')},
+  rescisao(p){const it=['Saldo de salário','Aviso prévio','Férias + 1/3','13º proporcional','Multa de 40% do FGTS','Guias: FGTS e seguro-desemprego'];
+    return `<div>${it.map((t,i)=>v(p>i,`<div class="item"><span class="num">${String(i+1).padStart(2,'0')}</span>${t}</div>`)).join('')}</div>
+    <div class="grid">${v(p>=7,`<div class="tile"><div class="n" style="font-size:56px">30+3<small>/ano</small></div><div class="d">aviso prévio, até 90 dias</div></div>`)}
+    ${v(p>=8,`<div class="tile" style="border-color:var(--ouro)"><div class="n">10<small> dias</small></div><div class="d">prazo para pagar</div></div>`)}</div>`},
+  prazo(p){return `
+    ${v(p>=1,`<div class="card"><div class="rot">Saiu da empresa</div><div class="bar" style="margin:16px 0 10px"><div class="f" style="width:100%"></div></div><div class="linha-conta">até <em>2 anos</em> para entrar com a ação</div></div>`)}
+    ${v(p>=2,`<div class="card"><div class="rot">A ação alcança</div><div class="linha-conta" style="margin-top:8px">os últimos <em>5 anos</em></div><div class="pequeno">contados da data em que a ação é proposta</div></div>`)}
+    ${v(p>=3,`<div class="card ouro" style="text-align:center"><div class="linha-conta">⏳ Esperar custa direitos</div></div>`)}`},
+  passos(p){const it=[['01','Anote seus horários reais'],['02','Guarde holerites, mensagens e fotos do ponto'],['03','Procure sindicato, Defensoria Pública ou advogado de confiança']];
+    return it.map(([n,t],i)=>v(p>i,`<div class="item"><span class="num">${n}</span>${t}</div>`)).join('')+
+      v(p>=4,`<div class="card ouro"><div class="pequeno" style="color:var(--texto)">Conteúdo informativo. Não substitui orientação para o seu caso.</div></div>`)}
+};
+window.render = (st) => {
+  document.getElementById('progresso').innerHTML = st.cenas.map((n,i)=>
+    `<div class="seg ${i+1<st.cena?'feito':''} ${i+1==st.cena?'atual':''}"><div class="barra"></div><div class="rot">${n}</div></div>`).join('');
+  document.getElementById('marca').textContent = `Cena ${st.cena} de ${st.cenas.length} · Sua jornada, seus direitos`;
+  document.getElementById('titulo').textContent = st.titulo;
+  const vis = st.visual, arg = vis.tipo==='checklist' ? vis.marcados : vis.passo;
+  document.getElementById('conteudo').innerHTML = VIS[vis.tipo](arg);
+  document.getElementById('base').innerHTML = `<b>Base legal:</b> ${st.base_legal}`;
+  const fr = document.getElementById('frase');
+  fr.textContent = st.texto; fr.style.fontSize = '52px';
+  for (let s = 52; s > 34 && fr.scrollHeight > 300; s -= 2) fr.style.fontSize = s + 'px';
+  // relata transbordamentos para o script conferir
+  const over = [];
+  const c = document.getElementById('conteudo');
+  if (c.scrollHeight > c.clientHeight + 2) over.push('conteudo');
+  if (fr.scrollHeight > 302) over.push('legenda');
+  const t = document.getElementById('titulo');
+  if (t.getBoundingClientRect().bottom > 470) over.push('titulo');
+  return over;
+};
+</script>
+</body>
+</html>
